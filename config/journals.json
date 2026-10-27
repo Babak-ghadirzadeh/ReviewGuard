@@ -1,0 +1,4 @@
+[
+  {"title":"Scientific Reports","issn":"2045-2322","website":"https://www.nature.com/srep/","pilot_purpose":"effectiveness","user_confirmed":true},
+  {"title":"Scientific Reviews","issn":"3120-4953","website":"https://www.nature.com/scirev/","pilot_purpose":"discovery_and_eligibility_compatibility","user_confirmed":true,"scope_conflict":"Journal excludes systematic reviews and meta-analyses. Do not expand the confirmed app scope implicitly."}
+]

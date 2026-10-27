@@ -1,0 +1,13 @@
+{
+  "journals": [
+    {"title": "Scientific Reports", "issn": "2045-2322", "enabled": true},
+    {"title": "Scientific Reviews", "issn": "3120-4953", "enabled": false, "reason": "Confirmed journal, but current scope excludes systematic reviews and meta-analyses."}
+  ],
+  "backfill_since": "2011-01-01",
+  "discovery_pages": 4,
+  "backfill_days_per_run": 3,
+  "reviews_per_run": 3,
+  "refresh_days": 7,
+  "crossref_reports_per_run": 100,
+  "ai": {"enabled": true, "model": "qwen3:1.7b", "proposals_per_run": 3}
+}

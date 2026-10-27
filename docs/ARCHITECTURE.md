@@ -1,0 +1,17 @@
+# Architecture
+
+The journal, review, report, notice and editorial case are separate objects. A report DOI is not a unique study or effect-size identity. Future study grouping must preserve that distinction.
+
+1. `pipeline.py` coordinates free source adapters. Discovery is by journal ISSN, with fast ranked candidate search, indexed-date updates and progressive day-sized backfill windows. `journal_works` retains unclassified records. Discovery windows are marked complete only after actual traversal; upstream coverage is still uncertain.
+2. `retrieve.py` retains metadata and versioned document hashes. Exact DOI identity is checked where supported. Public landing pages and observed supplements are used; no filenames or access routes are guessed. `http.py` limits requests, retries, sizes and redirects.
+3. `extract.py` retains text, tables, source labels, section context and explicit bibliography targets. JATS ranges are expanded by labels. Springer/Nature HTML is converted to the same citation representation after checking article identity. A changed extraction adapter invalidates cached analysis.
+4. `contributions.py` automatically links targets of explicit final-inclusion sentences in supported Results sections. Evidence is taken directly from an extraction of the registered source. Ambiguous ranges, missing DOIs, conflicting labels and count discrepancies are reported. Every current assessment remains coverage-incomplete. Ollama can suggest roles for ambiguous passages but has not qualified for automatic scientific judgments.
+5. `store.py` keeps machine links separate from human decisions, together with assessment versions and inactive historical links. Reanalysis replaces current machine links. Explicit human noncontributing decisions override conflicting machine links. Case evidence identifies the basis of each assertion.
+6. Daily jobs refresh Retraction Watch, check contributing report DOIs in Crossref, discover/retrieve/analyze new or changed reviews, and reconcile new links against the snapshot immediately. Newly added Crossref report checks occur in the next pass. The snapshot is checked against all known reference DOIs, so uncertain retracted citations can enter an exception queue; they are not treated as confirmed contributing reports.
+7. `report.py` provides localhost-only case decisions with Host, Origin and anti-forgery-token checks, bounded form sizes and a restrictive content security policy. Exporting reports never acknowledges cases. Decisions and source changes are auditable.
+
+SQLite uses WAL and a process-level writer lock. Interrupted runs remain distinguishable from successful ones; acquisition failures cannot erase the last good notice snapshot. The scheduler is a user-invoked macOS launchd installer; Linux can call the same `daily` command.
+
+A daily pass has an explicit request budget and limited work queues. Backfile coverage, identifier resolution, source freshness, operational completion and scientific qualification are separate concepts. `completed_with_coverage_gaps` means the attempted operational steps ran, not that every contributing study was found or every article screened.
+
+Unsupported paths needing adapters include unstructured publisher HTML, PDF reference/row matching, image/rotated-table OCR, forest plots, DOI-less identity resolution and study/report grouping. The design permits adding these without requiring authors to populate routine spreadsheets.

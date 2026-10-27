@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: Please cite this software when using it in research, and report its alpha status and coverage limitations.
+title: 'ReviewGuard: journal retraction surveillance'
+type: software
+version: 0.3.0a1
+date-released: '2026-10-27'
+license: MIT
+authors:
+  - name: ReviewGuard contributors
+repository-code: 'https://github.com/babak-ghadirzadeh/ReviewGuard'
