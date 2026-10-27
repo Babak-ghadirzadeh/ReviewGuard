@@ -356,6 +356,10 @@ class Store:
                 except (OSError,ValueError):pass
         distinct_reports=self.con.execute('SELECT count(*) FROM (SELECT report_doi FROM reference_candidates WHERE report_doi IS NOT NULL UNION SELECT report_doi FROM automatic_links WHERE active=1)').fetchone()[0]
         checked_reports=self.con.execute("SELECT count(DISTINCT target) FROM source_checks WHERE provider='crossref-report' AND succeeded_at IS NOT NULL AND target IN (SELECT report_doi FROM reference_candidates)").fetchone()[0]
+        import datetime as dt
+        contributing={r['report_doi'] for r in self.rows("SELECT DISTINCT report_doi FROM reference_candidates WHERE verified=1 AND role IN ('included_quantitative','included_qualitative') AND report_doi IS NOT NULL")}
+        contributing.update(a['report_doi'] for a in self.active_links())
+        successful={r['target'] for r in self.rows("SELECT target FROM source_checks WHERE provider='crossref-report' AND status='success' AND succeeded_at>=?",((dt.datetime.now(dt.timezone.utc)-dt.timedelta(hours=26)).isoformat(),))}
         return {'generated_at':now(),'reviews':reviews,'cases':cases,
                 'ai_proposals':proposals,
                 'provider_health':self.rows('SELECT * FROM source_checks ORDER BY provider,target'),
@@ -364,6 +368,8 @@ class Store:
                 'coverage':{'reviews':len(reviews),'reference_candidates':self.con.execute('SELECT count(*) FROM reference_candidates').fetchone()[0],
                             'verified_included_reports':self.con.execute("SELECT count(*) FROM (SELECT DISTINCT review_doi,report_doi FROM reference_candidates WHERE verified=1 AND role IN ('included_quantitative','included_qualitative'))").fetchone()[0],
                             'automatically_linked_reports':len({(a['review_doi'],a['report_doi']) for a in self.active_links()}),
+                            'contributing_report_dois':len(contributing),
+                            'contributing_reports_without_fresh_crossref_check':len(contributing-successful),
                             'unresolved_references':self.con.execute("SELECT count(*) FROM reference_candidates WHERE verified=0 OR role='uncertain' OR report_doi IS NULL").fetchone()[0],
                             'distinct_report_dois':distinct_reports,'report_dois_without_crossref_success':distinct_reports-checked_reports,
                             'current_notice_records':self.con.execute('SELECT count(*) FROM notices WHERE current=1').fetchone()[0],

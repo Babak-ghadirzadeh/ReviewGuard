@@ -57,7 +57,7 @@ def crossref_window(store,http,issn,start,end,max_pages=4,indexed=False):
                 store.con.execute('''INSERT INTO discovery_windows VALUES(?,?,?,?,?,?)
                 ON CONFLICT(issn,start_date,end_date) DO UPDATE SET status=excluded.status,
                 records=excluded.records,updated_at=excluded.updated_at''',(issn,start,end,status,records,now()))
-        store.check('crossref-discovery',f'{issn}:{"index" if indexed else start}',status,json.dumps(result))
+        store.check('crossref-discovery',f'{issn}:{"index" if indexed else start}','success' if status=='complete' else status,json.dumps(result))
         return result
     except (FetchError,ValueError,TypeError) as exc:
         store.check('crossref-discovery',f'{issn}:{"index" if indexed else start}','failed',str(exc))
@@ -145,6 +145,7 @@ def run_pipeline(store,http,config,force=False):
         for row in due[:config['reviews_per_run']]:
             doi=row['doi'];retrieved=step('retrieval_current',lambda:retrieve_article(store,http,doi))
             if retrieved:result['retrieval'].append(retrieved)
+            if not retrieved or not retrieved.get('metadata'):problems=True
             store.attempt(doi,'pipeline','refresh','','success' if retrieved and retrieved['metadata'] else 'failed',
                           'Attempt recorded for fair retry ordering; failed sources remain visible.')
         result.pop('retrieval_current',None)

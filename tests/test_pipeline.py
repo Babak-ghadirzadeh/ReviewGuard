@@ -45,6 +45,8 @@ class AutomaticEvidence(unittest.TestCase):
         self.assertEqual(case['category'],'editorial_assessment_required')
         self.assertEqual(self.s.snapshot()['coverage']['verified_included_reports'],0)
         self.assertEqual(self.s.snapshot()['coverage']['automatically_linked_reports'],3)
+        self.assertEqual(self.s.snapshot()['coverage']['contributing_report_dois'],3)
+        self.assertEqual(self.s.snapshot()['coverage']['contributing_reports_without_fresh_crossref_check'],3)
     def test_rerun_is_idempotent_and_cached(self):
         self.source();analyze_review(self.s,REVIEW);again=analyze_review(self.s,REVIEW)
         self.assertTrue(again['cached']);self.assertEqual(len(self.s.active_links()),3)
