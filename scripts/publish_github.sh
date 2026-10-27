@@ -2,7 +2,7 @@
 set -eu
 cd "$(dirname "$0")/.."
 command -v gh >/dev/null 2>&1 || { printf 'Install GitHub CLI from https://cli.github.com and run gh auth login.\n'; exit 1; }
-account=$(gh api user --jq .login)
+account=$(gh api user --jq .login | tr "[:upper:]" "[:lower:]")
 [ "$account" = babak-ghadirzadeh ] || { printf 'Sign in to the intended GitHub account babak-ghadirzadeh first.\n'; exit 1; }
 [ -z "$(git status --porcelain)" ] || { printf 'Commit the reviewed source changes before publication.\n'; exit 1; }
 branch=$(git branch --show-current)
